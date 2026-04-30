@@ -6,11 +6,7 @@ const cors = require('cors');
 const app = express();
 
 // Middleware
-app.use(cors({
-  origin: (origin, cb) => {
-    if (!origin || /^http:\/\/localhost:\d+$/.test(origin)) cb(null, true);
-    else cb(new Error('Not allowed by CORS'));
-  },
+app.use(cors(
   credentials: true
 }));
 app.use(express.json());
