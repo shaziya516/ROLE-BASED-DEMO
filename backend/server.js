@@ -6,7 +6,8 @@ const cors = require('cors');
 const app = express();
 
 // Middleware
-app.use(cors(
+app.use(cors({
+  origin: true,   // reflect request origin (allows all)
   credentials: true
 }));
 app.use(express.json());
