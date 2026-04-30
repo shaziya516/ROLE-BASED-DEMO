@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'https://role-based-demo.onrender.com:5000/api',
+  baseURL: 'https://role-based-demo.onrender.com/api',
   headers: { 'Content-Type': 'application/json' }
 });
 
