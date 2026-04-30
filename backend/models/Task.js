@@ -48,14 +48,13 @@ const taskSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 // Mark completedAt when status changes to done
-taskSchema.pre('save', function(next) {
+taskSchema.pre('save', function() {
   if (this.isModified('status') && this.status === 'done' && !this.completedAt) {
     this.completedAt = new Date();
   }
   if (this.isModified('status') && this.status !== 'done') {
     this.completedAt = undefined;
   }
-  next();
 });
 
 module.exports = mongoose.model('Task', taskSchema);
