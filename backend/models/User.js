@@ -14,8 +14,7 @@ const userSchema = new mongoose.Schema({
     required: [true, 'Email is required'],
     unique: true,
     lowercase: true,
-    trim: true,
-    match: [/^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/, 'Invalid email']
+    trim: true
   },
   password: {
     type: String,
@@ -27,10 +26,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['admin', 'member'],
     default: 'member'
-  },
-  avatar: {
-    type: String,
-    default: ''
   }
 }, { timestamps: true });
 
@@ -40,7 +35,7 @@ userSchema.pre('save', async function() {
 });
 
 userSchema.methods.comparePassword = async function(candidatePassword) {
-  return await bcrypt.compare(candidatePassword, this.password);
+  return bcrypt.compare(candidatePassword, this.password);
 };
 
 module.exports = mongoose.model('User', userSchema);

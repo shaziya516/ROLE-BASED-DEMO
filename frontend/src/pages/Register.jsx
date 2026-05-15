@@ -1,25 +1,24 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiZap, FiEye, FiEyeOff, FiShield, FiUser } from 'react-icons/fi';
 
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'member' });
-  const [showPass, setShowPass] = useState(false);
+  const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('member');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
-
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      await register(form.name, form.email, form.password, form.role);
-      navigate('/dashboard');
+      await register(name, email, password, role);
+      navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
     } finally {
@@ -29,63 +28,45 @@ export default function Register() {
 
   return (
     <div className="auth-page">
-      <div className="auth-bg">
-        <div className="auth-orb orb1" />
-        <div className="auth-orb orb2" />
-        <div className="auth-orb orb3" />
+      <div className="auth-top">
+        <h1>Team Task Manager</h1>
+        <p>Create a new account</p>
       </div>
-      <div className="auth-card">
-        <div className="auth-logo">
-          <div className="brand-icon large"><FiZap /></div>
-          <h1 className="auth-brand">TaskFlow</h1>
-          <p className="auth-subtitle">Create your account</p>
-        </div>
-
-        {error && <div className="alert alert-error">{error}</div>}
-
-        <form onSubmit={handleSubmit} className="auth-form">
-          <div className="form-group">
-            <label>Full Name</label>
-            <input name="name" type="text" placeholder="John Doe"
-              value={form.name} onChange={handleChange} required />
+      <div className="auth-box">
+        <h2>Register</h2>
+        <p className="sub">Fill in your details</p>
+        {error && <div className="error">{error}</div>}
+        <form onSubmit={handleSubmit}>
+          <div>
+            <label>Name</label>
+            <input type="text" value={name} onChange={e => setName(e.target.value)} required />
           </div>
-          <div className="form-group">
+          <div>
             <label>Email</label>
-            <input name="email" type="email" placeholder="john@example.com"
-              value={form.email} onChange={handleChange} required />
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
           </div>
-          <div className="form-group">
+          <div>
             <label>Password</label>
-            <div className="input-icon-wrapper">
-              <input name="password" type={showPass ? 'text' : 'password'}
-                placeholder="Min. 6 characters"
-                value={form.password} onChange={handleChange} required minLength={6} />
-              <button type="button" className="icon-btn" onClick={() => setShowPass(!showPass)}>
-                {showPass ? <FiEyeOff /> : <FiEye />}
-              </button>
-            </div>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
           </div>
-          <div className="form-group">
+          <div>
             <label>Role</label>
-            <div className="role-picker">
-              {['member', 'admin'].map(r => (
-                <button key={r} type="button"
-                  className={`role-btn ${form.role === r ? 'active' : ''}`}
-                  onClick={() => setForm({ ...form, role: r })}>
-                  {r === 'admin' ? <FiShield size={14} /> : <FiUser size={14} />}
-                  {r.charAt(0).toUpperCase() + r.slice(1)}
-                </button>
-              ))}
+            <div className="role-options">
+              <label>
+                <input type="radio" name="role" value="admin" checked={role === 'admin'} onChange={() => setRole('admin')} />
+                Admin
+              </label>
+              <label>
+                <input type="radio" name="role" value="member" checked={role === 'member'} onChange={() => setRole('member')} />
+                Member
+              </label>
             </div>
           </div>
-          <button type="submit" className="btn-primary full-width" disabled={loading}>
-            {loading ? <span className="btn-spinner" /> : 'Create Account'}
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? 'Please wait...' : 'Register'}
           </button>
         </form>
-
-        <p className="auth-link">
-          Already have an account? <Link to="/login">Sign in</Link>
-        </p>
+        <p className="auth-link">Have an account? <Link to="/login">Login here</Link></p>
       </div>
     </div>
   );

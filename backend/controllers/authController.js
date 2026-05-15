@@ -2,7 +2,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 const signToken = (id) =>
-  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE });
+  jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRE || '7d' });
 
 exports.register = async (req, res) => {
   try {
@@ -13,7 +13,8 @@ exports.register = async (req, res) => {
     const exists = await User.findOne({ email });
     if (exists) return res.status(400).json({ message: 'Email already registered' });
 
-    const user = await User.create({ name, email, password, role: role === 'admin' ? 'admin' : 'member' });
+    const userRole = role === 'admin' ? 'admin' : 'member';
+    const user = await User.create({ name, email, password, role: userRole });
     const token = signToken(user._id);
 
     res.status(201).json({
@@ -33,7 +34,7 @@ exports.login = async (req, res) => {
 
     const user = await User.findOne({ email }).select('+password');
     if (!user || !(await user.comparePassword(password)))
-      return res.status(401).json({ message: 'Invalid credentials' });
+      return res.status(401).json({ message: 'Invalid email or password' });
 
     const token = signToken(user._id);
     res.json({
@@ -49,9 +50,9 @@ exports.getMe = async (req, res) => {
   res.json({ user: req.user });
 };
 
-exports.getAllUsers = async (req, res) => {
+exports.getUsers = async (req, res) => {
   try {
-    const users = await User.find().select('-password').sort({ createdAt: -1 });
+    const users = await User.find().select('name email role').sort({ name: 1 });
     res.json({ users });
   } catch (err) {
     res.status(500).json({ message: err.message });

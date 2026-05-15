@@ -10,18 +10,16 @@ const taskSchema = new mongoose.Schema({
   description: {
     type: String,
     trim: true,
-    maxlength: 1000,
+    maxlength: 500,
     default: ''
   },
   status: {
     type: String,
-    enum: ['todo', 'in-progress', 'review', 'done'],
+    enum: ['todo', 'in-progress', 'done'],
     default: 'todo'
   },
-  priority: {
-    type: String,
-    enum: ['low', 'medium', 'high', 'critical'],
-    default: 'medium'
+  dueDate: {
+    type: Date
   },
   project: {
     type: mongoose.Schema.Types.ObjectId,
@@ -37,24 +35,7 @@ const taskSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true
-  },
-  dueDate: {
-    type: Date
-  },
-  tags: [{ type: String, trim: true }],
-  completedAt: {
-    type: Date
   }
 }, { timestamps: true });
-
-// Mark completedAt when status changes to done
-taskSchema.pre('save', function() {
-  if (this.isModified('status') && this.status === 'done' && !this.completedAt) {
-    this.completedAt = new Date();
-  }
-  if (this.isModified('status') && this.status !== 'done') {
-    this.completedAt = undefined;
-  }
-});
 
 module.exports = mongoose.model('Task', taskSchema);

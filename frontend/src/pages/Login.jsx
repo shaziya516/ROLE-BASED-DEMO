@@ -1,25 +1,22 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { FiZap, FiEye, FiEyeOff } from 'react-icons/fi';
 
 export default function Login() {
   const { login } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ email: '', password: '' });
-  const [showPass, setShowPass] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
-
-  const handleSubmit = async e => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      await login(form.email, form.password);
-      navigate('/dashboard');
+      await login(email, password);
+      navigate('/');
     } catch (err) {
       setError(err.response?.data?.message || 'Login failed');
     } finally {
@@ -29,45 +26,28 @@ export default function Login() {
 
   return (
     <div className="auth-page">
-      <div className="auth-bg">
-        <div className="auth-orb orb1" />
-        <div className="auth-orb orb2" />
-        <div className="auth-orb orb3" />
+      <div className="auth-top">
+        <h1>Team Task Manager</h1>
+        <p>Login to your account</p>
       </div>
-      <div className="auth-card">
-        <div className="auth-logo">
-          <div className="brand-icon large"><FiZap /></div>
-          <h1 className="auth-brand">TaskFlow</h1>
-          <p className="auth-subtitle">Sign in to your workspace</p>
-        </div>
-
-        {error && <div className="alert alert-error">{error}</div>}
-
-        <form onSubmit={handleSubmit} className="auth-form">
-          <div className="form-group">
+      <div className="auth-box">
+        <h2>Login</h2>
+        <p className="sub">Enter email and password</p>
+        {error && <div className="error">{error}</div>}
+        <form onSubmit={handleSubmit}>
+          <div>
             <label>Email</label>
-            <input name="email" type="email" placeholder="your@email.com"
-              value={form.email} onChange={handleChange} required />
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
           </div>
-          <div className="form-group">
+          <div>
             <label>Password</label>
-            <div className="input-icon-wrapper">
-              <input name="password" type={showPass ? 'text' : 'password'}
-                placeholder="Enter your password"
-                value={form.password} onChange={handleChange} required />
-              <button type="button" className="icon-btn" onClick={() => setShowPass(!showPass)}>
-                {showPass ? <FiEyeOff /> : <FiEye />}
-              </button>
-            </div>
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
           </div>
-          <button type="submit" className="btn-primary full-width" disabled={loading}>
-            {loading ? <span className="btn-spinner" /> : 'Sign In'}
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? 'Please wait...' : 'Login'}
           </button>
         </form>
-
-        <p className="auth-link">
-          Don&apos;t have an account? <Link to="/register">Sign up</Link>
-        </p>
+        <p className="auth-link">No account? <Link to="/register">Register here</Link></p>
       </div>
     </div>
   );

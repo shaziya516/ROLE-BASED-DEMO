@@ -20,23 +20,10 @@ exports.createProject = async (req, res) => {
 // Get all projects for user
 exports.getProjects = async (req, res) => {
   try {
-    let projects;
-    if (req.user.role === 'admin') {
-      projects = await Project.find()
-        .populate('owner', 'name email')
-        .populate('members.user', 'name email role')
-        .sort({ createdAt: -1 });
-    } else {
-      projects = await Project.find({
-        $or: [
-          { owner: req.user._id },
-          { 'members.user': req.user._id }
-        ]
-      })
-        .populate('owner', 'name email')
-        .populate('members.user', 'name email role')
-        .sort({ createdAt: -1 });
-    }
+    const projects = await Project.find()
+      .populate('owner', 'name email')
+      .populate('members.user', 'name email role')
+      .sort({ createdAt: -1 });
     res.json({ projects });
   } catch (err) {
     res.status(500).json({ message: err.message });
@@ -50,11 +37,6 @@ exports.getProject = async (req, res) => {
       .populate('owner', 'name email role')
       .populate('members.user', 'name email role');
     if (!project) return res.status(404).json({ message: 'Project not found' });
-
-    const isMember = project.owner._id.equals(req.user._id) ||
-      project.members.some(m => m.user._id.equals(req.user._id)) ||
-      req.user.role === 'admin';
-    if (!isMember) return res.status(403).json({ message: 'Access denied' });
 
     res.json({ project });
   } catch (err) {
